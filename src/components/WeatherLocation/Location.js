@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import './styles.css'
 
-const Location = ({data: { city, state, country }}) => {    
+const Location = ({data: { city, countryCode }}) => {    
     return (
         <div className="locationContainer">
-            <h1>{city}, {state}, {country}</h1>
+            <h1>{city}, {countryCode}</h1>
         </div>
     );
 };
@@ -14,8 +14,7 @@ const Location = ({data: { city, state, country }}) => {
 Location.propTypes = {
     data: PropTypes.shape({
         city: PropTypes.string.isRequired,
-        state: PropTypes.string.isRequired,
-        country: PropTypes.string.isRequired,
+        countryCode: PropTypes.string.isRequired,
     }).isRequired,
 }
 

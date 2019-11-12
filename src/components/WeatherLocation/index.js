@@ -12,6 +12,11 @@ import {
     WINDY,
 } from '../../constants/weathers';
 
+const apiConfig = {
+    url: 'https://api.openweathermap.org/data/2.5/weather',
+    apiKey: '71ca367d1b8f3136845d19400c79532b',
+}
+
 let weatherData = {
     temperature: 32,
     weatherState: SUN,
@@ -21,8 +26,7 @@ let weatherData = {
 
 let locationData = {
     city: 'Necoclí',
-    state: 'Antioquia',
-    country: 'Colombia',
+    countryCode: 'CO',
 };
 
 class WeatherLocation extends Component{
@@ -35,35 +39,38 @@ class WeatherLocation extends Component{
     }
 
     handleUpdateClick = () => {
+        locationData.countryCode = 'CO';
         locationData.city = "Medellín";
+
         weatherData.temperature = 25;
         weatherData.weatherState = RAIN;
         weatherData.humidity = 10;
         weatherData.wind = "10 m/s";
         
-        this.setState(
-            {
-                weather: this.getWeatherData(),
-                location: this.getLocationData(),
-            }
-        );
+        this.getWeatherData();
     }
 
     getWeatherData = () => {
-        return {
-            temperature: 25,
-            weatherState: RAIN,
-            humidity: 10,
-            wind: '35 m/s'
-        };
-    }
+        let actionApi = `${apiConfig.url}?q=${locationData.city},${locationData.countryCode}&appid=${apiConfig.apiKey}`;
+        fetch(actionApi).then(resolve => {
+            return resolve.json();
+        }).then( data => {
+            let { humidity, temp } = data.main;
+            let { speed } = data.wind;
+            let state = SUN;
 
-    getLocationData = () => {
-        return {
-            city: 'Medellín',
-            state: 'Antioquia',
-            country: 'Colombia',
-        };
+            this.setState(
+                {
+                    weather: {
+                        temperature: temp,
+                        humidity: humidity,
+                        weatherState: state,
+                        wind: `${speed} m/s`,
+                    },
+                    location: locationData,
+                }
+            );
+        });
     }
 
     render(){
