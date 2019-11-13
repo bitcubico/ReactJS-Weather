@@ -4,27 +4,12 @@ import Location from './Location';
 import WeatherData from './WeatherData';
 import './styles.css';
 import {
-    CLOUD,
-    CLOUDY,
-    FOG,
     RAIN,
-    SNOW,
     SUN,
-    WINDY,
 } from '../../constants/weathers';
+import { URL, API_KEY } from '../../constants/apiOpenWeatherMapConfig';
 
-const apiConfig = {
-    url: 'https://api.openweathermap.org/data/2.5/weather',
-    apiKey: '71ca367d1b8f3136845d19400c79532b',
-    apiKeyAux: '516675c8c69ac463eac822b96bf12665',
-}
-
-let weatherData = {
-    temperature: 32,
-    weatherState: SUN,
-    humidity: 30,
-    wind: '25 m/s'
-};
+let weatherData = null;
 
 let locationData = {
     city: 'Necoclí',
@@ -56,13 +41,13 @@ class WeatherLocation extends Component {
     }
 
     getWeatherData = () => {
-        let actionApi = `${apiConfig.url}?q=${locationData.city},${locationData.countryCode}&appid=${apiConfig.apiKeyAux}`;
+        let actionApi = `${URL}?q=${locationData.city},${locationData.countryCode}&appid=${API_KEY}`;
         fetch(actionApi).then(resolve => {
             return resolve.json();
         }).then(data => {
             console.debug(data);
 
-            if(data.cod != 200){
+            if(data.cod !== 200){
                 this.setState(
                     {
                         weather: null,
