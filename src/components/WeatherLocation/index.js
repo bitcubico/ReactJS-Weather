@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import convert from 'convert-units';
 import Location from './Location';
 import WeatherData from './WeatherData';
 import './styles.css';
@@ -15,6 +16,7 @@ import {
 const apiConfig = {
     url: 'https://api.openweathermap.org/data/2.5/weather',
     apiKey: '71ca367d1b8f3136845d19400c79532b',
+    apiKeyAux: '516675c8c69ac463eac822b96bf12665',
 }
 
 let weatherData = {
@@ -54,7 +56,7 @@ class WeatherLocation extends Component {
     }
 
     getWeatherData = () => {
-        let actionApi = `${apiConfig.url}?q=${locationData.city},${locationData.countryCode}&appid=${apiConfig.apiKey}&units=metric`;
+        let actionApi = `${apiConfig.url}?q=${locationData.city},${locationData.countryCode}&appid=${apiConfig.apiKeyAux}`;
         fetch(actionApi).then(resolve => {
             return resolve.json();
         }).then(data => {
@@ -78,7 +80,7 @@ class WeatherLocation extends Component {
             this.setState(
                 {
                     weather: {
-                        temperature: temp,
+                        temperature: this.convertTemperature(temp),
                         humidity: humidity,
                         weatherState: this.getWeatherState(state),
                         wind: `${speed} m/s`,
@@ -88,6 +90,10 @@ class WeatherLocation extends Component {
                 }
             );
         }).catch(error => this.setState({ weather: null, location: null, error: error }));
+    }
+
+    convertTemperature = kelvin => {
+        return convert(kelvin).from("K").to("C").toFixed(2);
     }
 
     getWeatherState(state) {
