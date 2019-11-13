@@ -24,15 +24,16 @@ const icons = {
     [THUNDER]: THUNDER,
 }
 
-const getWeatherIconTemplate = (weatherState) => {
-    let icon = icons[weatherState];
+const getWeatherIconTemplate = weatherStatus => {
+    //console.debug(weatherStatus);
+    let icon = icons[weatherStatus];
     icon = icon == null ? icons.SUN : icon;
     return <WeatherIcons name={icon} size="4x" className="wicon" />
 }
 
-const WeatherTemperature = ({data: {temperature, weatherState}}) => (
+const WeatherTemperature = ({data: {temperature, weatherStatus}}) => (
     <div className="weatherTemperatureContainer">
-        { getWeatherIconTemplate(weatherState) }
+        { getWeatherIconTemplate(weatherStatus) }
         <span className="temperature">{temperature}</span>
         <span className="temperatureType">°C</span>
     </div>
@@ -41,7 +42,7 @@ const WeatherTemperature = ({data: {temperature, weatherState}}) => (
 // VALIDATIONS
 WeatherTemperature.prototype = {
     data: PropTypes.shape({
-        weatherState: PropTypes.string.isRequired,
+        weatherStatus: PropTypes.string.isRequired,
         temperture: PropTypes.number.isRequired,
     }).isRequired,
 }

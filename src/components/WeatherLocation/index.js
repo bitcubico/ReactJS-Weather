@@ -18,45 +18,36 @@ import {
 import { URL, API_KEY } from '../../constants/apiOpenWeatherMapConfig';
 
 class WeatherLocation extends Component {
-    locationData = {
-        city: '',
-        countryCode: '',
-    };
-
     constructor(props) {
         super(props);
-
-        this.locationData.city = props.city;
-        this.locationData.countryCode = props.countryCode;
-
+        
+        let { city } = props;
         this.state = {
             weather: null,
-            location: null,
+            city: null,
             error: null,
         }
 
-        this.getWeatherData();
+        this.getWeatherData(city);
     }
 
     handleUpdateClick = () => {
-        this.locationData.countryCode = 'CO';
-        this.locationData.city = "Medellín";
-
-        this.getWeatherData();
+        this.getWeatherData("Medellín, CO");
     }
 
-    getWeatherData = () => {
-        let actionApi = `${URL}?q=${this.locationData.city},${this.locationData.countryCode}&appid=${API_KEY}`;
+    getWeatherData = city => {
+        let actionApi = `${URL}?q=${city}&appid=${API_KEY}`;
         fetch(actionApi).then(resolve => {
             return resolve.json();
         }).then(data => {
+            console.debug(`Estado del tiempo para: ${city}`);
             console.debug(data);
 
             if(data.cod !== 200){
                 this.setState(
                     {
                         weather: null,
-                        location: null,
+                        city: null,
                         error: data.message,
                     }
                 );
@@ -65,30 +56,32 @@ class WeatherLocation extends Component {
 
             let { humidity, temp } = data.main;
             let { speed } = data.wind;
-            let state = data.weather[0];
+            let status = data.weather[0];
             
             this.setState(
                 {
                     weather: {
                         temperature: this.convertTemperature(temp),
                         humidity: humidity,
-                        weatherState: this.getWeatherState(state),
+                        weatherStatus: this.getWeatherStatus(status),
                         wind: `${speed} m/s`,
                     },
-                    location: this.locationData,
+                    city,
                     error: null,
                 }
             );
-        }).catch(error => this.setState({ weather: null, location: null, error: error }));
+        }).catch(error => this.setState({ weather: null, city: null, error: error }));
     }
 
     convertTemperature = kelvin => {
         return convert(kelvin).from("K").to("C").toFixed(2);
     }
 
-    getWeatherState = state => {
+    getWeatherStatus = state => {
         // Estados https://openweathermap.org/weather-conditions
         let { id } = state;
+        //console.debug(id);
+
         if(id < 300)
             return THUNDER;
         else if(id < 400)
@@ -106,8 +99,8 @@ class WeatherLocation extends Component {
     }
 
     render() {
-        return this.state.error == null
-            ? this.state.location == null || this.state.weather == null 
+        return this.state.error === null
+            ? this.state.city === null || this.state.weather === null 
                 ? (
                     <div className="weatherLocationContainer">
                         <CircularProgress />
@@ -115,7 +108,7 @@ class WeatherLocation extends Component {
                 )
                 : (
                     <div className="weatherLocationContainer">
-                        <Location data={this.state.location} />
+                        <Location city={this.state.city} />
                         <WeatherData data={this.state.weather} />
                         <button onClick={this.handleUpdateClick}>Actualizar</button>
                     </div>
@@ -131,7 +124,6 @@ class WeatherLocation extends Component {
 
 WeatherLocation.propTypes = {
     city: PropTypes.string.isRequired,
-    countryCode: PropTypes.string.isRequired,
 }
 
 export default WeatherLocation;

@@ -2,20 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types'
 import './styles.css'
 
-const Location = ({data: { city, countryCode }}) => {    
+const Location = ({ city }) => {    
     return (
         <div className="locationContainer">
-            <h1>{city}, {countryCode}</h1>
+            <h1>{city}</h1>
         </div>
     );
 };
 
 // VALIDACIONES
 Location.propTypes = {
-    data: PropTypes.shape({
-        city: PropTypes.string.isRequired,
-        countryCode: PropTypes.string.isRequired,
-    }).isRequired,
+    city: PropTypes.string.isRequired,
 }
 
 export default Location;
