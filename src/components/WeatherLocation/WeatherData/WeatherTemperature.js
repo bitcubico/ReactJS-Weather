@@ -8,19 +8,20 @@ import {
     RAIN,
     SNOW,
     SUN,
-    WINDY,
+    THUNDER,
+    DRIZZLE,
 } from '../../../constants/weathers'
 
 // Iconos que se puden desplegar, esto se obtienen desde la documentación de react-weathericos
-// https://erikflowers.github.io/weather-icons/
 const icons = {
     [CLOUD]: CLOUD,
     [CLOUDY]: CLOUDY,
+    [DRIZZLE]: DRIZZLE,
     [FOG]: FOG,
     [RAIN]: RAIN,
     [SNOW]: SNOW,
     [SUN]: SUN,
-    [WINDY]: WINDY,
+    [THUNDER]: THUNDER,
 }
 
 const getWeatherIconTemplate = (weatherState) => {

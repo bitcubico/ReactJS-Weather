@@ -1,24 +1,34 @@
 import React, { Component } from 'react';
+import { PropTypes } from 'prop-types';
 import convert from 'convert-units';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Location from './Location';
 import WeatherData from './WeatherData';
 import './styles.css';
 import {
+    CLOUD,
     RAIN,
+    SNOW,
     SUN,
-} from '../../constants/weathers';
+    THUNDER,
+    DRIZZLE,
+    CLOUDY,
+} from '../../constants/weathers'
+
 import { URL, API_KEY } from '../../constants/apiOpenWeatherMapConfig';
 
-let weatherData = null;
-
-let locationData = {
-    city: 'Necoclí',
-    countryCode: 'CO',
-};
-
 class WeatherLocation extends Component {
-    constructor() {
-        super();
+    locationData = {
+        city: '',
+        countryCode: '',
+    };
+
+    constructor(props) {
+        super(props);
+
+        this.locationData.city = props.city;
+        this.locationData.countryCode = props.countryCode;
+
         this.state = {
             weather: null,
             location: null,
@@ -29,19 +39,14 @@ class WeatherLocation extends Component {
     }
 
     handleUpdateClick = () => {
-        locationData.countryCode = 'CO';
-        locationData.city = "Medellín";
-
-        weatherData.temperature = 25;
-        weatherData.weatherState = RAIN;
-        weatherData.humidity = 10;
-        weatherData.wind = "10 m/s";
+        this.locationData.countryCode = 'CO';
+        this.locationData.city = "Medellín";
 
         this.getWeatherData();
     }
 
     getWeatherData = () => {
-        let actionApi = `${URL}?q=${locationData.city},${locationData.countryCode}&appid=${API_KEY}`;
+        let actionApi = `${URL}?q=${this.locationData.city},${this.locationData.countryCode}&appid=${API_KEY}`;
         fetch(actionApi).then(resolve => {
             return resolve.json();
         }).then(data => {
@@ -60,7 +65,7 @@ class WeatherLocation extends Component {
 
             let { humidity, temp } = data.main;
             let { speed } = data.wind;
-            let state = data.weather[0].main;
+            let state = data.weather[0];
             
             this.setState(
                 {
@@ -70,7 +75,7 @@ class WeatherLocation extends Component {
                         weatherState: this.getWeatherState(state),
                         wind: `${speed} m/s`,
                     },
-                    location: locationData,
+                    location: this.locationData,
                     error: null,
                 }
             );
@@ -81,8 +86,23 @@ class WeatherLocation extends Component {
         return convert(kelvin).from("K").to("C").toFixed(2);
     }
 
-    getWeatherState(state) {
-        return SUN;
+    getWeatherState = state => {
+        // Estados https://openweathermap.org/weather-conditions
+        let { id } = state;
+        if(id < 300)
+            return THUNDER;
+        else if(id < 400)
+            return DRIZZLE;
+        else if(id < 600)
+            return RAIN;
+        else if(id < 700)
+            return SNOW;
+        else if(id < 800)
+            return CLOUDY;
+        else if(id === 800)
+            return SUN;
+        
+        return CLOUD;
     }
 
     render() {
@@ -90,7 +110,7 @@ class WeatherLocation extends Component {
             ? this.state.location == null || this.state.weather == null 
                 ? (
                     <div className="weatherLocationContainer">
-                        <span>Loading weather, please wait...</span>
+                        <CircularProgress />
                     </div>
                 )
                 : (
@@ -107,6 +127,11 @@ class WeatherLocation extends Component {
                 </div>
             );
     }
+}
+
+WeatherLocation.propTypes = {
+    city: PropTypes.string.isRequired,
+    countryCode: PropTypes.string.isRequired,
 }
 
 export default WeatherLocation;
